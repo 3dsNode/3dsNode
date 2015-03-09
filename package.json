@@ -1,7 +1,7 @@
 {
-  "name": "3dsstream",
+  "name": "3dsNode",
   "version": "0.1.0",
-  "description": "3ds streaming test",
+  "description": "3ds remote control tool",
   "author": "Arnaud Bruyer <arnaud.bruyer@gmail.com>",
   "license": "GPLv3",
   "dependencies": {
