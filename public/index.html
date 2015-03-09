@@ -11,13 +11,33 @@
 	<iframe id="topscreen" src="./loading/logo.gif" width="400" height="215" frameborder="0"></iframe>
   </div>
   <div id="bottom">
-	<br/><br/>
-	<a class="button" href="./controller.html" target="_blank">Controller</a>
-	<a class="button" href="./media.html" target="_blank">Media</a>
+	<br/>
+	App: <select id='select'></select>
+	<br/>
+	<button id='go'>go</button>
   </div>
   <p id="console"></p>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
   <script type="text/javascript" src="./js/bottom.js"></script>
   <script>
+	var socket = io();
+	socket.emit('apps','');
+	
+	var select = document.getElementById('select');
+	socket.on('apps', function(msg) {
+		for(i in msg) {
+			var option = document.createElement('option');
+			option.value = './'+msg[i]+'.html';
+			option.innerHTML = msg[i].charAt(0).toUpperCase() + msg[i].slice(1);
+			select.appendChild(option);
+		}
+	});
+
+	document.getElementById('go').onclick = function() {
+		window.open(select.value, '_blank');
+	}
+
 	setTimeout(function () {
 		document.getElementById('topscreen').src = './logo/logo.gif';
 	}, 10000);

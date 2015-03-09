@@ -1,6 +1,6 @@
 {
   "name": "3ds",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "3ds remote control tool",
   "author": "Arnaud Bruyer <arnaud.bruyer@gmail.com>",
   "license": "GPLv3",
