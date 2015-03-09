@@ -1,0 +1,28 @@
+body {
+	color: black;
+	background-color: white;
+	text-align: center;
+}
+
+#top {
+	top: 250px;
+	left: 300px;
+	position: absolute;
+	z-index: 0;
+}
+
+#bottom {
+	top: 465px;
+	left: 340px;
+	background-color: #f1f1f1f1;
+	position: absolute;
+	z-index: 100;
+}
+
+.button {
+	text-decoration: none;
+	color: #ffffff;
+	background-color: #33a186;
+	padding: 2px 2px 2px 2px;
+	border: 1px solid #0d624d;
+}
