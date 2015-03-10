@@ -24,18 +24,38 @@ try {
 
 //Exports
 exports.io = io;
+exports.os = os;
+
+//Logging OS informations
+console.log('Running on '+os.platform());
 
 //Apps
 var apps = [];
 var appnames = [];
 var appfiles = fs.readdirSync('./apps');
 for(i in appfiles) {
+	if(appfiles[i].indexOf('.js') == -1) {
+		continue;
+	}
+	
+	var appname = appfiles[i].replace('.js','');
+	if(appfiles[i].indexOf('-o-') != -1) {
+		var osn = os.platform().substring(0, 3);
+		if(appfiles[i].indexOf(osn) == -1) {
+			continue;
+		} else {
+			appname = appname.split('-o-')[1];
+		}
+	}
 	var dsapp = require('./apps/'+appfiles[i]);
 	if(dsapp != undefined && dsapp.success) {
 		apps[apps.length] = dsapp;
-		var appname = appfiles[i].replace('.js','');
 		appnames[appnames.length] = appname;
-		console.log('Added '+appname);
+		console.log('Added: '+appname);
+	} else if(dsapp == undefined) {
+		console.log('Undefined: '+appname);
+	} else if(!dsapp.success) {
+		console.log('Unsuccessful launch: '+appname);
 	}
 }
 
