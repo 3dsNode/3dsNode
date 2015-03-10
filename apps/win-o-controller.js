@@ -1,28 +1,28 @@
 //Imports
-var mouse;
-var keyboard;
+var robot;
 var main = require('../index.js');
 
 //Modules try
 try {
-	mouse = require('node_mouse');
-	keyboard = require('node_keyboard');
+	robot = require("kbm-robot");
 } catch(ex) {
 	console.log(ex.toString());
 	return;
 }
 
-console.log(mouse);
+robot.startJar();
 
 //Controller keys definition
-var Mask = [keyboard.Key_B,keyboard.Key_A,keyboard.Key_X,keyboard.Key_Y,mouse.Mouse_Left,mouse.Mouse_Right,0,0,0,0,0,0,keyboard.Key_UP,keyboard.Key_DOWN,keyboard.Key_LEFT,keyboard.Key_RIGHT];
-var Controls = [keyboard.Key_O,keyboard.Key_P,keyboard.Key_WINDOWS,keyboard.Key_ENTER,keyboard.Key_EXIT,
-keyboard.Key_BACK_SPACE,keyboard.Key_SPACE,
-keyboard.Key_1,keyboard.Key_2,keyboard.Key_3,keyboard.Key_4,keyboard.Key_5,keyboard.Key_6,keyboard.Key_7,keyboard.Key_8,keyboard.Key_9];
+var Mask = ['B','A','X','Y','1','3',0,0,0,0,0,0,'UP','DOWN','LEFT','RIGHT'];
+var Controls = ['O','P','WINDOWS','ENTER','EXIT',
+'BACKSPACE','SPACE',
+'KP_1','KP_2','KP_3','KP_4','KP_5','KP_6','KP_7','KP_8','KP_9'];
 
 //Mouse move modifier
 var mouse_x = 0;
 var mouse_y = 0;
+var s_mouse_x = 0;
+var s_mouse_y = 0;
 
 //Socket events
 main.io.on('connection', function(socket) {
@@ -42,16 +42,16 @@ main.io.on('connection', function(socket) {
 				if(i == 4 || i == 5) {
 					//Emulated mouse (L/R)
 					if(nb[i] == 1) {
-						mouse.press(Mask[i]);
+						robot.mousePress(Mask[i]).go();
 					} else {
-						mouse.release(Mask[i]);
+						robot.mouseRelease(Mask[i]).go();
 					}
 				} else {
 					//Emulated keyboard
 					if(nb[i] == 1) {
-						keyboard.press(Mask[i]);
+						robot.press(Mask[i]).go();
 					} else {
-						keyboard.release(Mask[i]);
+						robot.release(Mask[i]).go();
 					}
 				}
 			}
@@ -62,7 +62,7 @@ main.io.on('connection', function(socket) {
 	//Emulated keyboard (On screen buttons)
 	socket.on('sbutton', function(msg) {
 	    console.log('controls: ' + msg);
-		keyboard.click(Controls[msg]);
+		robot.type(Controls[msg],10).go();
 	});
 
 	//Mouse modifier (Left stick)
@@ -90,11 +90,11 @@ main.io.on('connection', function(socket) {
 
 //Moving mouse if needed
 setInterval(function() {
-	var currentPosition = mouse.getCurrentPosition();
-	console.log(JSON.stringify(currentPosition,null,2));
-	/*var x = MouseInfo.getPointerInfoSync().getLocationSync().x;
-	var y = MouseInfo.getPointerInfoSync().getLocationSync().y;
-	robot.mouseMove(Math.floor(x+mouse_x), Math.floor(y+mouse_y));*/
+	if(mouse_x != 0 || mouse_y != 0) {
+		s_mouse_x = Math.floor(s_mouse_x+mouse_x);
+		s_mouse_y = Math.floor(s_mouse_y+mouse_y);
+		robot.mouseMove(s_mouse_x, s_mouse_y).go();
+	}
 }, 5);
 
 exports.success = true;

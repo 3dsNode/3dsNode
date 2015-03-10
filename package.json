@@ -26,8 +26,7 @@
     "player"
   ],
   "optionalDependencies": {
-    "node_keyboard": "^0.0.4",
-    "node_mouse": "^0.0.1",
-	"java": "^0.4.6"
+    "java": "^0.4.6",
+    "kbm-robot": "0.0.2"
   }
 }
