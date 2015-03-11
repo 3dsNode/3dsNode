@@ -20,6 +20,7 @@
   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
   <script src="/socket.io/socket.io.js"></script>
   <script type="text/javascript" src="./js/bottom.js"></script>
+  <script type="text/javascript" src="../js/indexcss.js"></script>
   <script>
 	var socket = io();
 	socket.emit('apps','');
@@ -28,7 +29,7 @@
 	socket.on('apps', function(msg) {
 		for(i in msg) {
 			var option = document.createElement('option');
-			option.value = './'+msg[i]+'.html';
+			option.value = './apps/'+msg[i]+'.html';
 			option.innerHTML = msg[i].charAt(0).toUpperCase() + msg[i].slice(1);
 			select.appendChild(option);
 		}

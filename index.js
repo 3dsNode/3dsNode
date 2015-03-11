@@ -82,12 +82,15 @@ http.listen(25505, function() {
 });
 
 //Socket events
+var sockets = 0;
 io.on('connection', function(socket) {
-	console.log('Socket #'+socket.id+' connected');
+	sockets++;
+	var socket_id = sockets;
+	console.log('Socket #'+socket_id+' connected');
 
 	//On socket disconnected
 	socket.on('disconnect', function() {
-	    	console.log('Socket #'+socket.id+' disconnected');
+	    	console.log('Socket #'+socket_id+' disconnected');
 	});
 
 	//Send apps list

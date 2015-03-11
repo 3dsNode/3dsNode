@@ -1,10 +1,12 @@
 //Imports
 var robot;
+var config;
 var main = require('../index.js');
 
 //Modules try
 try {
 	robot = require("kbm-robot");
+	config = require('config');
 } catch(ex) {
 	console.log(ex.toString());
 	return;
@@ -13,16 +15,32 @@ try {
 robot.startJar();
 
 //Controller keys definition
-var Mask = ['B','A','X','Y','1','3',0,0,0,0,0,0,'UP','DOWN','LEFT','RIGHT'];
-var Controls = ['O','P','WINDOWS','ENTER','EXIT',
-'BACKSPACE','SPACE',
-'KP_1','KP_2','KP_3','KP_4','KP_5','KP_6','KP_7','KP_8','KP_9'];
+var Mask = config.get("Controller.physical");
+var Controls = config.get("Controller.screen");
 
 //Mouse move modifier
 var mouse_x = 0;
 var mouse_y = 0;
-var s_mouse_x = 0;
-var s_mouse_y = 0;
+var s_mouse_x = 1;
+var s_mouse_y = 1;
+
+function action(key, pressed) {
+	if(key.indexOf("MOUSE_") != -1) {
+		//Emulated mouse
+		if(pressed == 1) {
+			robot.mousePress(key).go();
+		} else {
+			robot.mouseRelease(key).go();
+		}
+	} else {
+		//Emulated keyboard
+		if(pressed == 1) {
+			robot.press(key).go();
+		} else {
+			robot.release(key).go();
+		}
+	}
+}
 
 //Socket events
 main.io.on('connection', function(socket) {
@@ -37,23 +55,7 @@ main.io.on('connection', function(socket) {
 		var nb = msg.split(',');
 		for(i in nb) {
 			if(nb[i] != buttons[i]) {
-				console.log('input: '+i+':'+nb[i]);
-	
-				if(i == 4 || i == 5) {
-					//Emulated mouse (L/R)
-					if(nb[i] == 1) {
-						robot.mousePress(Mask[i]).go();
-					} else {
-						robot.mouseRelease(Mask[i]).go();
-					}
-				} else {
-					//Emulated keyboard
-					if(nb[i] == 1) {
-						robot.press(Mask[i]).go();
-					} else {
-						robot.release(Mask[i]).go();
-					}
-				}
+				action(Mask[i],nb[i]);
 			}
 		}
 		buttons = nb;
@@ -61,8 +63,8 @@ main.io.on('connection', function(socket) {
 
 	//Emulated keyboard (On screen buttons)
 	socket.on('sbutton', function(msg) {
-	    console.log('controls: ' + msg);
-		robot.type(Controls[msg],10).go();
+		action(Controls[msg],'1');
+		action(Controls[msg],'0');
 	});
 
 	//Mouse modifier (Left stick)
