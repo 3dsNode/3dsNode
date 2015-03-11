@@ -26,7 +26,6 @@
     "player"
   ],
   "optionalDependencies": {
-    "java": "^0.4.6",
     "kbm-robot": "0.0.2"
   }
 }
