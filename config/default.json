@@ -1,7 +1,7 @@
 {
 	"Media": {
-		"music": "/home/user/Music",
-		"video": "/home/user/Video"
+		"music": "C:/Users/Arnaud/Music",
+		"video": "Video"
 	},
 
 	"Controller": {

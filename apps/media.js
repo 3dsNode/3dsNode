@@ -1,11 +1,13 @@
 //Imports
 var main = require('../index.js');
-var config;
+var path;
 var fs;
+var compatible = ['.mp3','.mp4'];
 
 //Modules try
 try {
-	config = require('config');
+	fs = require('fs');
+	path = require('path');
 } catch(ex) {
 	console.log(ex.toString());
 	return;
@@ -14,19 +16,30 @@ try {
 //Medias counter
 var media = '';
 
+var home = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
+
 //Socket events
 main.io.on('connection', function(socket) {
 	//Send requested file list
 	socket.on('listfiles', function(msg) {
-		var file = '';
-		if(msg.indexOf('@') != -1) {
-			var list = msg.split('@');
-			file = config.get(list[0])+'/'+list[1];
-		} else {
-			file = config.get(msg);
-		}
+		var file = home+'/'+msg;
 		try {
-			socket.emit('files', fs.readdirSync(file));
+			var files = fs.readdirSync(file);
+			var ok = [];
+			for(i in files) {
+				var ext = path.extname(files[i]);
+				if(files[i].indexOf('.') != 0 && (ext == '' || compatible.indexOf(ext) != -1)) {
+					if(ext == '') {
+						try {
+							fs.readdirSync(file+'/'+files[i]);
+							ok[ok.length] = files[i];
+						} catch(ex) {}
+					} else {
+						ok[ok.length] = files[i];
+					}
+				}
+			}
+			socket.emit('files', ok);
 		} catch(ex) {
 			socket.emit('alert', 'Incompatible file');
 		}
@@ -35,18 +48,13 @@ main.io.on('connection', function(socket) {
 	//Play requested media file remotely
   	socket.on('playmedia', function(msg) {
 		console.log('play media: '+msg);
-		var file = '';
+		var file = home+'/'+msg;
 		media++;
-		if(msg.indexOf('@') != -1) {
-			var list = msg.split('@');
-			file = config.get(list[0])+'/'+list[1];
-		} else {
-			file = msg;
-		}
-		app.get('/media'+media, function(req, res) {
+
+		main.app.get('/media'+media, function(req, res) {
 			res.sendFile(file);
 		});
-		socket.emit('playmedia','./media'+media);
+		socket.emit('playmedia','../media'+media);
 	});
 });
 

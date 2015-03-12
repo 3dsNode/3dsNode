@@ -27,6 +27,7 @@ try {
 //Exports
 exports.io = io;
 exports.os = os;
+exports.app = app;
 
 //Logging OS informations
 console.log('Running on '+os.platform());
