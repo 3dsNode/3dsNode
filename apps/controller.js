@@ -88,6 +88,13 @@ main.io.on('connection', function(socket) {
 			mouse_y*=20;
 		}
 	});
+
+	//Keyboard type text
+	socket.on('typedtext', function(msg) {
+		if(msg != null) {
+			robot.typeString(msg).go();
+		}
+	});
 });
 
 //Moving mouse if needed
