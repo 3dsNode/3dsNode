@@ -11,9 +11,11 @@
 	<iframe id="topscreen" src="../logo/logo.gif" width="400" height="215" frameborder="0"></iframe>
   </div>
   <div id="bottom">
-	<p id="buttons"></p>
-	<p id="axis"></p>
-	<p id="axis-c"></p>
+	<form action="" onsubmit="return sendText();">
+		Type text: <input id="send" type="text" name="typed">
+		<input type="submit">
+	</form>
+	<br/>
 	<a class="button" onclick="socket.emit('sbutton', '0');">start</a>
 	<a class="button" onclick="socket.emit('sbutton', '1');">select</a>
 	<a class="button" onclick="socket.emit('sbutton', '2');">home</a>

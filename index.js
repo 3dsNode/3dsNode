@@ -1,5 +1,4 @@
-var version = '0.1.2';
-console.log('Starting 3dsNode '+'v'+version+'...');
+console.log('Starting 3dsNode...');
 
 //Create app
 var express = require('express');

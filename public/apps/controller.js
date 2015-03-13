@@ -34,4 +34,10 @@ setInterval(function() {
 	document.getElementById('buttons').innerHTML = buttons;
 	document.getElementById('axis').innerHTML = axx+':'+axy;
 	document.getElementById('axis-c').innerHTML = caxx+':'+caxy;
-}, 100);
+}, 100);test
+
+function sendText() {
+	socket.emit('typedtext', document.getElementById('send').value);test
+	document.getElementById('send').value = '';
+	return false;
+}
