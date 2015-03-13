@@ -1,9 +1,4 @@
 {
-	"Media": {
-		"music": "C:/Users/Arnaud/Music",
-		"video": "Video"
-	},
-
 	"Controller": {
 		"physical": ["B","A","X","Y","MOUSE_1","MOUSE_3",0,0,0,0,0,0,"UP","DOWN","LEFT","RIGHT"],
 		"screen": ["O","P","WINDOWS","ENTER","EXIT","BACKSPACE","SPACE","KP_1","KP_2","KP_3","KP_4","KP_5","KP_6","KP_7","KP_8","KP_9"]
