@@ -14,6 +14,7 @@
 	<form action="" onsubmit="return sendText();">
 		Type text: <input id="send" type="text" name="typed">
 		<input type="submit">
+		<input type="file" name="fileToUpload" id="fileToUpload">
 	</form>
 	<br/>
 	<a class="button" onclick="socket.emit('sbutton', '0');">start</a>

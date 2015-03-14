@@ -2,12 +2,13 @@
 var main = require('../index.js');
 var path;
 var fs;
-var compatible = ['.mp3','.mp4'];
+var ffmpeg;
 
 //Modules try
 try {
 	fs = require('fs');
 	path = require('path');
+	ffmpeg = require('fluent-ffmpeg');
 } catch(ex) {
 	console.log(ex.toString());
 	return;
@@ -15,6 +16,7 @@ try {
 
 //Medias counter
 var media = '';
+var compatible = ['.mp3','.mp4','.avi','.ogv','.mkv'];
 
 var home = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
 
@@ -47,14 +49,37 @@ main.io.on('connection', function(socket) {
 
 	//Play requested media file remotely
   	socket.on('playmedia', function(msg) {
-		console.log('play media: '+msg);
-		var file = home+'/'+msg;
 		media++;
 
-		main.app.get('/media'+media, function(req, res) {
-			res.sendFile(file);
-		});
-		socket.emit('playmedia','../media'+media);
+		console.log('play media: '+msg);
+		var file = home+'/'+msg;
+		var outdir = main.os.tmpdir()+'/3dsnode';
+		var out = outdir+'/media-'+path.basename(msg).replace(path.extname(msg),'')+'.mp4';
+
+		if(!fs.existsSync(outdir))
+			fs.mkdirSync(outdir);
+
+		if(!fs.existsSync(out) && path.extname(msg) != 'mp4') {
+			var command = ffmpeg(file).audioCodec('aac').videoCodec('libx264').size('400x240')
+			.on('progress', function(progress) {
+				socket.emit('mediainfo','Transcoding progress: '+Math.round(progress.percent * 100) / 100+'%');
+			})
+			.on('error', function(err) {
+				socket.emit('mediainfo','Error: '+err.message);
+			})
+			.on('end', function() {
+				console.log('Finished transcoding!');
+				main.app.get('/media'+media, function(req, res) {
+					res.sendFile(out);
+				});
+				socket.emit('playmedia','../media'+media);
+			}).save(out);
+		} else {
+			main.app.get('/media'+media, function(req, res) {
+				res.sendFile(out);
+			});
+			socket.emit('playmedia','../media'+media);
+		}
 	});
 });
 

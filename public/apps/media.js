@@ -1,6 +1,6 @@
 var socket = io();
 var actual = '';
-var compatible = ['mp3','mp4'];
+var compatible = ['mp3','mp4','avi','avi','ogv','mkv'];
 
 var bottom = document.getElementById('bottom');
 
@@ -89,6 +89,10 @@ socket.on('files', function(msg) {
 
 socket.on('playmedia', function(msg) {
 	document.location.href = msg;
+});
+
+socket.on('mediainfo', function(msg) {
+	bottom.innerHTML = msg;
 });
 
 socket.on('alert', function(msg) {
