@@ -27,6 +27,7 @@ try {
 exports.io = io;
 exports.os = os;
 exports.app = app;
+exports.dir = __dirname;
 
 //Logging OS informations
 console.log('Running on '+os.platform());
