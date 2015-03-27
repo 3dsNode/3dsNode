@@ -5,22 +5,24 @@ var main = require('../index.js');
 
 var emu = process.exec('java -jar apps/arch/arch_server.jar');
 
+emu.stdout.on('data',function(chunk){
+	var decoder = new StringDecoder('utf8');
+	var inst = decoder.write(chunk);
+	if(inst == 'TOP_UPDATE') {
+		main.io.emit('screen-update-top','');
+	} else if(inst == 'BOTTOM_UPDATE') {
+		main.io.emit('screen-update-bottom','');
+	} else if(inst.indexOf('POPUP:') == 0) {
+		main.io.emit('popup',inst.replace('POPUP:',''));
+	}
+});
+
+emu.stderr.on('data',function(chunk){
+	var decoder = new StringDecoder('utf8');
+	console.log(decoder.write(chunk));
+});
+
 main.io.on('connection', function(socket) {
-	emu.stdout.on('data',function(chunk){
-		var decoder = new StringDecoder('utf8');
-		var inst = decoder.write(chunk);
-		if(inst == 'SCREEN_UPDATE') {
-			socket.emit('screen-update','');
-		} else if(inst.indexOf('POPUP:') == 0) {
-			socket.emit('popup',inst.replace('POPUP:',''));
-		}
-	});
-
-	emu.stderr.on('data',function(chunk){
-		var decoder = new StringDecoder('utf8');
-		console.log(decoder.write(chunk));
-	});
-
 	socket.on('arch-buttons', function(msg) {
 		emu.stdin.write("BUTTONS:"+msg+"\n");
 	});
@@ -51,10 +53,18 @@ main.io.on('connection', function(socket) {
 });
 
 main.app.get('/topscreen', function(req, res) {
-	res.sendFile(main.dir + '/apps/arch/top.png');
+	try {
+		res.sendFile(main.dir + '/apps/arch/top.png');
+	} catch (err) {
+		console.log(err);
+	}
 });
 main.app.get('/bottomscreen', function(req, res) {
-	res.sendFile(main.dir + '/apps/arch/bottom.png');
+	try {
+		res.sendFile(main.dir + '/apps/arch/bottom.png');
+	} catch (err) {
+		console.log(err);
+	}
 });
 
 exports.success = true;
