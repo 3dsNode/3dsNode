@@ -30,43 +30,43 @@ setInterval(function() {
 	}
 }, 10);
 
-var bottom = document.getElementById('bottomscreen');
-bottom.addEventListener('mousemove', function(evt) {
-	socket.emit('arch-mouse-move', evt.clientX+','+evt.clientY);
-}, false);
-bottom.addEventListener('mousedown', function(evt) {
-	socket.emit('arch-mouse-down', evt.clientX+','+evt.clientY);
-}, false);
-bottom.addEventListener('mouseup', function(evt) {
-	socket.emit('arch-mouse-up', evt.clientX+','+evt.clientY);
-}, false);
-bottom.addEventListener('click', function(evt) {
-	socket.emit('arch-mouse-click', evt.clientX+','+evt.clientY);
-}, false);
+setTimeout(function() {
+	var bottom = document.getElementById('bottomscreen');
+	bottom.addEventListener('mousemove', function(evt) {
+		socket.emit('arch-mouse-move', evt.clientX+','+evt.clientY);
+	}, false);
+	bottom.addEventListener('mousedown', function(evt) {
+		socket.emit('arch-mouse-down', evt.clientX+','+evt.clientY);
+	}, false);
+	bottom.addEventListener('mouseup', function(evt) {
+		socket.emit('arch-mouse-up', evt.clientX+','+evt.clientY);
+	}, false);
+	bottom.addEventListener('click', function(evt) {
+		socket.emit('arch-mouse-click', evt.clientX+','+evt.clientY);
+	}, false);
 
-socket.on('screen-update', function(msg) {
 	var top = document.getElementById('topscreen');
 	var top_image = new Image();
-	top_image.src = '../topscreen';
+	top_image.src = '../logo/logo.gif';
 	top_image.onload = function(){
 		top.getContext('2d').drawImage(top_image, 0, 0);
 	}
 
 	var bottom = document.getElementById('bottomscreen');
 	var bottom_image = new Image();
-	bottom_image.src = '../bottomscreen';
 	bottom_image.onload = function(){
 		bottom.getContext('2d').drawImage(bottom_image, 0, 0);
 	}
-});
 
-socket.on('popup', function(msg) {
-	alert(msg);
-});
+	socket.on('screen-update-top', function(msg) {
+		top_image.src = '../topscreen';
+	});
 
-var logo = document.getElementById("topscreen");
-var logo_image = new Image();
-logo_image.src = '../logo/logo.gif';
-logo_image.onload = function(){
-	logo.getContext('2d').drawImage(logo_image, 0, 0);
-}
+	socket.on('screen-update-bottom', function(msg) {
+		bottom_image.src = '../bottomscreen';
+	});
+
+	socket.on('popup', function(msg) {
+		alert(msg);
+	});
+}, 100);
