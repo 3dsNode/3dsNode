@@ -30,12 +30,6 @@ setInterval(function() {
 	}
 }, 10);
 
-setInterval(function() {
-	document.getElementById('buttons').innerHTML = buttons;
-	document.getElementById('axis').innerHTML = axx+':'+axy;
-	document.getElementById('axis-c').innerHTML = caxx+':'+caxy;
-}, 100);
-
 function sendText() {
 	socket.emit('typedtext', document.getElementById('send').value);test
 	document.getElementById('send').value = '';
