@@ -16,14 +16,22 @@ try {
 
 //Medias counter
 var media = '';
-var compatible = ['.mp3','.mp4','.avi','.ogv','.mkv'];
+var compatible = ['.mp4','.avi','.ogv','.mkv'];
 
 var home = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
+
+main.app.get('/remote', function(req, res) {
+	res.sendFile(main.dir + '/public/computer/remote.html');
+});
+main.app.get('/remote.js', function(req, res) {
+	res.sendFile(main.dir + '/public/computer/remote.js');
+});
+console.log('Remote: Connect your video player to *:25505/remote');
 
 //Socket events
 main.io.on('connection', function(socket) {
 	//Send requested file list
-	socket.on('listfiles', function(msg) {
+	socket.on('listfiles-remote', function(msg) {
 		var file = home+'/'+msg;
 		try {
 			var files = fs.readdirSync(file);
@@ -48,19 +56,20 @@ main.io.on('connection', function(socket) {
 	});
 
 	//Play requested media file remotely
-  	socket.on('playmedia', function(msg) {
+  	socket.on('playremote', function(msg) {
 		media++;
 
-		console.log('play media: '+msg);
+		console.log('play remote: '+msg);
 		var file = home+'/'+msg;
 		var outdir = main.os.tmpdir()+'/3dsnode';
-		var out = outdir+'/media-'+path.basename(msg).replace(path.extname(msg),'')+'.mp4';
+		var out = outdir+'/remote-'+path.basename(msg).replace(path.extname(msg),'')+'.mp4';
 
 		if(!fs.existsSync(outdir))
 			fs.mkdirSync(outdir);
 
-		if(!fs.existsSync(out) && path.extname(msg) != '.mp4' && path.extname(msg) != '.mp3') {
-			var command = ffmpeg(file).audioCodec('aac').videoCodec('libx264').size('400x240')
+		console.log(path.extname(msg));
+		if(!fs.existsSync(out) && path.extname(msg) != '.mp4') {
+			var command = ffmpeg(file).audioCodec('aac').videoCodec('libx264')
 			.on('progress', function(progress) {
 				socket.emit('mediainfo','Transcoding progress: '+Math.round(progress.percent * 100) / 100+'%');
 			})
@@ -69,22 +78,27 @@ main.io.on('connection', function(socket) {
 			})
 			.on('end', function() {
 				console.log('Finished transcoding!');
-				main.app.get('/media'+media, function(req, res) {
+				main.app.get('/remote'+media, function(req, res) {
 					res.sendFile(out);
 				});
-				socket.emit('playmedia','../media'+media);
+				main.io.sockets.emit('playremote','../../remote'+media);
 			}).save(out);
 		} else if(fs.existsSync(out)) {
-			main.app.get('/media'+media, function(req, res) {
+			main.app.get('/remote'+media, function(req, res) {
 				res.sendFile(out);
 			});
-			socket.emit('playmedia','../media'+media);
+			main.io.sockets.emit('playremote','../../remote'+media);
 		} else {
-			main.app.get('/media'+media, function(req, res) {
+			main.app.get('/remote'+media, function(req, res) {
 				res.sendFile(file);
 			});
-			socket.emit('playmedia','../media'+media);
+			main.io.sockets.emit('playremote','../../remote'+media);
 		}
+	});
+
+	//Broadcast requests to players
+  	socket.on('remote-ctrl', function(msg) {
+		main.io.sockets.emit('remote-ctrl',msg);
 	});
 });
 

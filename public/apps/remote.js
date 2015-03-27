@@ -1,6 +1,6 @@
 var socket = io();
 var actual = '';
-var compatible = ['mp3','mp4','avi','avi','ogv','mkv'];
+var compatible = ['mp4','avi','avi','ogv','mkv'];
 
 var bottom = document.getElementById('bottom');
 
@@ -19,12 +19,12 @@ var createSelect = function(msg) {
 		var comp = false;
 		for(i in compatible) {
 			if(select.value.indexOf(compatible[i]) != -1) {
-				socket.emit('playmedia', dir+select.value);
+				socket.emit('playremote', dir+select.value);
 				comp = true;
 			}
 		}
 		if(!comp) {
-			socket.emit('listfiles', dir+select.value);
+			socket.emit('listfiles-remote', dir+select.value);
 			actual = dir+select.value;
 		}
 	}
@@ -53,7 +53,7 @@ root.onclick = function() {
 	bottom.removeChild(document.getElementById('files'));
 	actual = '';
 	createSelect([]);
-	socket.emit('listfiles', '');
+	socket.emit('listfiles-remote', '');
 };
 bottom.appendChild(root);
 
@@ -63,7 +63,7 @@ back.onclick = function() {
 	bottom.removeChild(document.getElementById('files'));
 	actual = actual.lastIndexOf('/') == -1 ? '' : actual.substring(0,actual.lastIndexOf('/'));
 	createSelect([]);
-	socket.emit('listfiles', actual);
+	socket.emit('listfiles-remote', actual);
 };
 bottom.appendChild(back);
 
@@ -81,14 +81,10 @@ bottom.appendChild(document.createElement('br'));
 
 createSelect([]);
 
-socket.emit('listfiles', '');
+socket.emit('listfiles-remote', '');
 
 socket.on('files', function(msg) {
 	createSelect(msg);
-});
-
-socket.on('playmedia', function(msg) {
-	document.location.href = msg;
 });
 
 socket.on('mediainfo', function(msg) {
