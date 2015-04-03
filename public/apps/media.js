@@ -95,6 +95,10 @@ socket.on('mediainfo', function(msg) {
 	bottom.innerHTML = msg;
 });
 
+socket.on('mediaload', function(msg) {
+	bottom.innerHTML = '<progress value="'+msg+'" max="100"></progress>';
+});
+
 socket.on('alert', function(msg) {
 	alert(msg);
 });
