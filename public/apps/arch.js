@@ -68,5 +68,16 @@ setTimeout(function() {
 
 	socket.on('popup', function(msg) {
 		alert(msg);
+		socket.emit('arch-response', 'true');
+	});
+
+	socket.on('confirm_popup', function(msg) {
+		var response = confirm(msg);
+		socket.emit('arch-response', response);
+	});
+
+	socket.on('prompt_popup', function(msg) {
+		var response = prompt(msg,'');
+		socket.emit('arch-response', response);
 	});
 }, 100);
