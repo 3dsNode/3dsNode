@@ -3,52 +3,57 @@ var process = require('child_process');
 var StringDecoder = require('string_decoder').StringDecoder;
 var main = require('../index.js');
 
-var emu = process.exec('java -jar apps/arch/arch_server.jar');
+var emu = process.exec('java -jar apps/arch/3dsArch.jar --server');
 
-emu.stdout.on('data',function(chunk){
+emu.stderr.on('data',function(chunk){
 	var decoder = new StringDecoder('utf8');
 	var inst = decoder.write(chunk);
 	if(inst == 'TOP_UPDATE') {
 		main.io.emit('screen-update-top','');
 	} else if(inst == 'BOTTOM_UPDATE') {
 		main.io.emit('screen-update-bottom','');
-	} else if(inst.indexOf('POPUP:') == 0) {
-		main.io.emit('popup',inst.replace('POPUP:',''));
+	} else if(inst.indexOf('METHOD@') == 0) {
+		var comm = inst.replace('METHOD@','').split(':');
+		main.io.emit(comm[0].toLowerCase(),comm[1]);
 	}
 });
 
-emu.stderr.on('data',function(chunk){
+emu.stdout.on('data',function(chunk){
 	var decoder = new StringDecoder('utf8');
 	console.log(decoder.write(chunk));
 });
 
 main.io.on('connection', function(socket) {
+	socket.on('arch-response', function(msg) {
+		emu.stdin.write('METHODRESPONSE:'+msg+'\n');
+	});
+
 	socket.on('arch-buttons', function(msg) {
-		emu.stdin.write("BUTTONS:"+msg+"\n");
+		emu.stdin.write('BUTTONS:'+msg+'\n');
 	});
 
 	socket.on('arch-axis', function(msg) {
-		emu.stdin.write("AXIS:"+msg+"\n");
+		emu.stdin.write('AXIS:'+msg+'\n');
 	});
 
 	socket.on('arch-axis-c', function(msg) {
-		emu.stdin.write("AXISC:"+msg+"\n");
+		emu.stdin.write('AXISC:'+msg+'\n');
 	});
 
 	socket.on('arch-mouse-down', function(msg) {
-		emu.stdin.write("MOUSEDOWN:"+msg+"\n");
+		emu.stdin.write('MOUSEDOWN:'+msg+'\n');
 	});
 
 	socket.on('arch-mouse-up', function(msg) {
-		emu.stdin.write("MOUSEUP:"+msg+"\n");
+		emu.stdin.write('MOUSEUP:'+msg+'\n');
 	});
 
 	socket.on('arch-mouse-click', function(msg) {
-		emu.stdin.write("MOUSECLICK:"+msg+"\n");
+		emu.stdin.write('MOUSECLICK:'+msg+'\n');
 	});
 
 	socket.on('arch-mouse-move', function(msg) {
-		emu.stdin.write("MOUSEMOVE:"+msg+"\n");
+		emu.stdin.write('MOUSEMOVE:'+msg+'\n');
 	});
 });
 

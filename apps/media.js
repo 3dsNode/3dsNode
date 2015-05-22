@@ -62,7 +62,9 @@ main.io.on('connection', function(socket) {
 		if(!fs.existsSync(out) && path.extname(msg) != '.mp4' && path.extname(msg) != '.mp3') {
 			var command = ffmpeg(file).audioCodec('aac').videoCodec('libx264').size('400x240')
 			.on('progress', function(progress) {
-				socket.emit('mediaload',Math.round(progress.percent * 100) / 100+'%');
+				var nprogress = Math.round(progress.percent * 100) / 100;
+				socket.emit('mediaload',nprogress);
+				console.log('Trannscoding '+path.basename(msg)+': '+nprogress+'%');
 			})
 			.on('error', function(err) {
 				socket.emit('mediainfo','Error: '+err.message);
